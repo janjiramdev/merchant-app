@@ -1,10 +1,10 @@
-import { IsInt, IsOptional, IsString, Min, MinLength } from 'class-validator';
+import { IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class SearchRolesDto {
   @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  @MinLength(1)
   name?: string;
 
   @IsOptional()

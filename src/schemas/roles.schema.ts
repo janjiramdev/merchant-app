@@ -35,7 +35,7 @@ export class Role {
   @Prop({
     type: Date,
     unique: false,
-    required: true,
+    required: false,
     nullable: true,
   })
   deletedAt: Date;

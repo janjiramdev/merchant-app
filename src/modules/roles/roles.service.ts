@@ -5,8 +5,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
-import { Role } from 'src/schemas/roles.schema';
+import { Model, Types } from 'mongoose';
+import { Role } from 'src/schemas/role.schema';
 import { throwException } from 'src/utils/exception.util';
 import { SearchRolesDto } from './dtos/search-roles.dto';
 import { CreateRoleDto } from './dtos/create-role.dto';
@@ -27,9 +27,9 @@ export class RolesService {
     const { name } = createRoleDto;
 
     try {
-      const role = await this.roleModel.findOne({ name });
+      const role = await this.roleModel.findOne({ name, deletedAt: null });
       if (role)
-        throw new BadRequestException(`role name: ${name} already in use`);
+        throw new BadRequestException(`role with name: ${name} already in use`);
 
       return await this.roleModel.create({
         name,
@@ -55,10 +55,11 @@ export class RolesService {
     const { name, userCount } = args;
 
     try {
-      let filterObject: SearchRolesDto = {};
+      let filterObject = {};
       if (name) filterObject = { ...filterObject, name };
       if (userCount !== undefined)
         filterObject = { ...filterObject, userCount };
+      filterObject = { ...filterObject, deletedAt: null };
 
       return await this.roleModel.find(filterObject).exec();
     } catch (err) {
@@ -78,19 +79,41 @@ export class RolesService {
     const methodName = 'updateRoleById';
     this.logger.log(methodName, 'updateRoleDto:', updateRoleDto, 'id:', id);
 
-    const { name } = updateRoleDto;
+    const { name, userCount } = updateRoleDto;
 
     try {
-      if (!name)
+      if (!name && userCount === undefined)
         throw new BadRequestException(
           `updateRole detail not found: ${JSON.stringify(updateRoleDto)}`,
         );
 
-      const role = await this.roleModel.findById(id);
-      if (!role) throw new NotFoundException(`role id: ${id} not found`);
+      const findById = await this.roleModel.findOne({
+        _id: id,
+        deletedAt: null,
+      });
+      if (!findById) throw new NotFoundException(`role id: ${id} not found`);
+
+      let updateObject = {};
+      if (name) {
+        if (name !== findById.name) {
+          const findByName = await this.roleModel.findOne({
+            name,
+            deletedAt: null,
+          });
+          if (findByName)
+            throw new BadRequestException(
+              `role with name: ${name} already in use`,
+            );
+          else updateObject = { name };
+        } else updateObject = { name };
+      }
+      if (userCount !== undefined)
+        updateObject = { ...updateObject, userCount };
 
       return (await this.roleModel
-        .findByIdAndUpdate(id, updateRoleDto, { new: true })
+        .findByIdAndUpdate(new Types.ObjectId(id), updateObject, {
+          new: true,
+        })
         .exec()) as Role;
     } catch (err) {
       throwException({
@@ -107,14 +130,16 @@ export class RolesService {
     this.logger.log(methodName, 'id:', id);
 
     try {
-      const role = await this.searchRoles({});
-      if (!role) throw new NotFoundException('role not found');
+      const role = await this.roleModel.findOne({ _id: id, deletedAt: null });
+      if (!role) throw new NotFoundException(`role id: ${id} not found`);
 
-      const response = await this.roleModel
-        .findByIdAndDelete(id, { new: true })
-        .exec();
-
-      return response as Role;
+      return (await this.roleModel
+        .findByIdAndUpdate(
+          new Types.ObjectId(id),
+          { deletedAt: new Date() },
+          { new: true },
+        )
+        .exec()) as Role;
     } catch (err) {
       throwException({
         className,

@@ -8,14 +8,17 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { RolesService } from './roles.service';
-import { Role } from 'src/schemas/roles.schema';
+import { Role } from 'src/schemas/role.schema';
 import { IApiResponse } from 'src/interfaces/api.interface';
 import { SearchRolesDto } from './dtos/search-roles.dto';
 import { CreateRoleDto } from './dtos/create-role.dto';
 import { UpdateRoleDto } from './dtos/update-role.dto';
+import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
 
+@UseGuards(AccessTokenGuard)
 @Controller('roles')
 export class RolesController {
   private logger = new Logger('RolesController');
@@ -41,22 +44,19 @@ export class RolesController {
 
   @Patch(':id')
   async updateRoleById(
-    @Param('id') paramId: string,
+    @Param('id') id: string,
     @Body() body: UpdateRoleDto,
   ): Promise<IApiResponse<Role>> {
-    this.logger.log('updateRoleById paramId:', paramId, 'body:', body);
-
-    const response = await this.rolesService.updateRoleById(body, paramId);
+    this.logger.log('updateRoleById id:', id, 'body:', body);
+    const response = await this.rolesService.updateRoleById(body, id);
     this.logger.log('updateRoleById response:', response);
     return { data: response };
   }
 
   @Delete(':id')
-  async deleteRoleById(
-    @Param('id') paramId: string,
-  ): Promise<IApiResponse<Role>> {
-    this.logger.log('deleteRoleById paramId:', paramId);
-    const response = await this.rolesService.deleteRoleById(paramId);
+  async deleteRoleById(@Param('id') id: string): Promise<IApiResponse<Role>> {
+    this.logger.log('deleteRoleById id:', id);
+    const response = await this.rolesService.deleteRoleById(id);
     this.logger.log('deleteRoleById response:', response);
     return { data: response };
   }

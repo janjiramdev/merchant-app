@@ -36,7 +36,7 @@ export class RolesController {
   async searchRoles(
     @Query() query: SearchRolesDto,
   ): Promise<IApiResponse<Role[]>> {
-    this.logger.log('searchRoles', ' query:', query);
+    this.logger.log('searchRoles query:', query);
     const response = await this.rolesService.searchRoles(query);
     this.logger.log('searchRoles response: ', response);
     return { data: response };
@@ -48,7 +48,7 @@ export class RolesController {
     @Body() body: UpdateRoleDto,
   ): Promise<IApiResponse<Role>> {
     this.logger.log('updateRoleById id:', id, 'body:', body);
-    const response = await this.rolesService.updateRoleById(body, id);
+    const response = await this.rolesService.updateRoleById(id, body);
     this.logger.log('updateRoleById response:', response);
     return { data: response };
   }

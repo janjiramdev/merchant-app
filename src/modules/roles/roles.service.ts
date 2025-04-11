@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { Role } from 'src/schemas/role.schema';
 import { throwException } from 'src/utils/exception.util';
 import { SearchRolesDto } from './dtos/search-roles.dto';
@@ -50,13 +50,13 @@ export class RolesService {
 
   async searchRoles(args: SearchRolesDto): Promise<Role[]> {
     const methodName = 'searchRoles';
-    this.logger.log(methodName, ' args:', args);
+    this.logger.log(methodName, 'args:', args);
 
     const { name, userCount } = args;
 
     try {
       let filterObject = {};
-      if (name) filterObject = { ...filterObject, name };
+      if (name) filterObject = { name };
       if (userCount !== undefined)
         filterObject = { ...filterObject, userCount };
       filterObject = { ...filterObject, deletedAt: null };
@@ -73,11 +73,11 @@ export class RolesService {
   }
 
   async updateRoleById(
-    updateRoleDto: UpdateRoleDto,
     id: string,
+    updateRoleDto: UpdateRoleDto,
   ): Promise<Role> {
     const methodName = 'updateRoleById';
-    this.logger.log(methodName, 'updateRoleDto:', updateRoleDto, 'id:', id);
+    this.logger.log(methodName, 'id:', id, 'updateRoleDto:', updateRoleDto);
 
     const { name, userCount } = updateRoleDto;
 
@@ -93,7 +93,7 @@ export class RolesService {
       });
       if (!findById) throw new NotFoundException(`role id: ${id} not found`);
 
-      let updateObject = {};
+      const updateObject: UpdateRoleDto = {};
       if (name) {
         if (name !== findById.name) {
           const findByName = await this.roleModel.findOne({
@@ -104,14 +104,13 @@ export class RolesService {
             throw new BadRequestException(
               `role with name: ${name} already in use`,
             );
-          else updateObject = { name };
-        } else updateObject = { name };
+          else updateObject.name = name;
+        } else updateObject.name = name;
       }
-      if (userCount !== undefined)
-        updateObject = { ...updateObject, userCount };
+      if (userCount !== undefined) updateObject.userCount = userCount;
 
       return (await this.roleModel
-        .findByIdAndUpdate(new Types.ObjectId(id), updateObject, {
+        .findOneAndUpdate({ _id: id }, updateObject, {
           new: true,
         })
         .exec()) as Role;
@@ -134,11 +133,7 @@ export class RolesService {
       if (!role) throw new NotFoundException(`role id: ${id} not found`);
 
       return (await this.roleModel
-        .findByIdAndUpdate(
-          new Types.ObjectId(id),
-          { deletedAt: new Date() },
-          { new: true },
-        )
+        .findOneAndUpdate({ _id: id }, { deletedAt: new Date() }, { new: true })
         .exec()) as Role;
     } catch (err) {
       throwException({

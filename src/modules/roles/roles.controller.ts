@@ -16,12 +16,13 @@ import { IApiResponse } from 'src/interfaces/api.interface';
 import { SearchRolesDto } from './dtos/search-roles.dto';
 import { CreateRoleDto } from './dtos/create-role.dto';
 import { UpdateRoleDto } from './dtos/update-role.dto';
-import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
+import { AccessTokenGuard } from 'src/modules/auth/guards/access-token.guard';
 
 @UseGuards(AccessTokenGuard)
 @Controller('roles')
 export class RolesController {
-  private logger = new Logger('RolesController');
+  private readonly logger = new Logger('RolesController');
+
   constructor(private readonly rolesService: RolesService) {}
 
   @Post()

@@ -9,17 +9,20 @@ import { Model } from 'mongoose';
 import { User, UserWithId } from 'src/schemas/user.schema';
 import { CreateUserDto } from './dtos/create-user.dto';
 import { throwException } from 'src/utils/exception.util';
-import * as bcrypt from 'bcrypt';
 import { SearchUsersDto } from './dtos/search-users.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
+import { IUpdateUserRefreshToken } from 'src/interfaces/users.interface';
+import { hashData } from 'src/utils/hash.util';
 
 const className = 'UsersService';
 
 @Injectable()
 export class UsersService {
-  private logger = new Logger('UsersService');
+  private readonly logger = new Logger('UsersService');
 
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private readonly userModel: Model<User>,
+  ) {}
 
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const methodName = 'createUser';
@@ -35,7 +38,7 @@ export class UsersService {
           `user with username: ${username} already in use`,
         );
 
-      const hashedPassword: string = await bcrypt.hash(password, 10);
+      const hashedPassword: string = await hashData(password);
 
       return await this.userModel.create({
         username,
@@ -106,7 +109,7 @@ export class UsersService {
         );
 
       const updateObject: Partial<UpdateUserDto> = {};
-      if (password) updateObject.password = await bcrypt.hash(password, 10);
+      if (password) updateObject.password = await hashData(password);
       if (firstname) updateObject.firstname = firstname;
       if (lastname) updateObject.lastname = lastname;
       if (age) updateObject.age = age;
@@ -147,9 +150,19 @@ export class UsersService {
   }
 
   async getValidateUser(username: string): Promise<UserWithId | null> {
-    this.logger.log(`getValidateUser username: ${username}`);
+    this.logger.log('getValidateUser username:', username);
     return await this.userModel
-      .findOne({ username }, { _id: true, username: true, password: true })
+      .findOne(
+        { username },
+        { _id: true, username: true, password: true, refreshToken: true },
+      )
       .exec();
+  }
+
+  async updateUserRefreshToken(args: IUpdateUserRefreshToken): Promise<void> {
+    this.logger.log('updateUserRefreshToken args:', args);
+    const { _id, refreshToken } = args;
+    const hashed = await hashData(refreshToken);
+    await this.userModel.findOneAndUpdate({ _id }, { refreshToken: hashed });
   }
 }

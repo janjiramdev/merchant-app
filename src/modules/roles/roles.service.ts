@@ -16,9 +16,11 @@ const className = 'RolesService';
 
 @Injectable()
 export class RolesService {
-  private logger = new Logger('RolesService');
+  private readonly logger = new Logger('RolesService');
 
-  constructor(@InjectModel(Role.name) private roleModel: Model<Role>) {}
+  constructor(
+    @InjectModel(Role.name) private readonly roleModel: Model<Role>,
+  ) {}
 
   async createRole(createRoleDto: CreateRoleDto): Promise<Role> {
     const methodName = 'createRole';

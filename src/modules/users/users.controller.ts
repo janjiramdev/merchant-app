@@ -16,11 +16,12 @@ import { User } from 'src/schemas/user.schema';
 import { IApiResponse } from 'src/interfaces/api.interface';
 import { SearchUsersDto } from './dtos/search-users.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { AccessTokenGuard } from 'src/auth/guards/access-token.guard';
+import { AccessTokenGuard } from 'src/modules/auth/guards/access-token.guard';
 
 @Controller('users')
 export class UsersController {
-  private logger = new Logger('UsersController');
+  private readonly logger = new Logger('UsersController');
+
   constructor(private readonly usersService: UsersService) {}
 
   @Post()

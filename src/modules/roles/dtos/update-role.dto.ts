@@ -2,8 +2,8 @@ import { IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
 
 export class UpdateRoleDto {
   @IsOptional()
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   name?: string;
 
   @IsOptional()

@@ -23,7 +23,9 @@ export class RefreshTokenStrategy extends PassportStrategy(
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get('JWT_REFRESH_TOKEN_SECRET') as string,
+      secretOrKey: configService.get<string>(
+        'JWT_REFRESH_TOKEN_SECRET',
+      ) as string,
       passReqToCallback: true,
     });
   }
@@ -37,6 +39,6 @@ export class RefreshTokenStrategy extends PassportStrategy(
     if (!user || !user.refreshToken || !comparedToken)
       throw new ForbiddenException('access denied');
 
-    return { ...payload };
+    return { id: payload.sub, username: payload.username };
   }
 }

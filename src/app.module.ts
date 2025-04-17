@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { RolesModule } from './modules/roles/roles.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -8,7 +7,7 @@ import { AuthModule } from './modules/auth/auth.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: [`.env`],
+      envFilePath: ['.env'],
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -17,7 +16,6 @@ import { AuthModule } from './modules/auth/auth.module';
       }),
       inject: [ConfigService],
     }),
-    RolesModule,
     UsersModule,
     AuthModule,
   ],

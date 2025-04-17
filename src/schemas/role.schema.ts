@@ -3,6 +3,7 @@ import { HydratedDocument, Types } from 'mongoose';
 
 export type RolesDocument = HydratedDocument<Role>;
 
+// Hold
 @Schema({ collection: 'roles' })
 export class Role {
   @Prop({ type: String, unique: false, required: true, nullable: false })
@@ -14,7 +15,9 @@ export class Role {
     required: true,
     nullable: false,
   })
-  userCount: Date;
+  userCount: number;
+
+  // ----- ----- ----- Timestamp ----- ----- ----- //
 
   @Prop({
     type: Date,

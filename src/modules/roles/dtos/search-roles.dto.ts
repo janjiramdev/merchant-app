@@ -3,8 +3,8 @@ import { Type } from 'class-transformer';
 
 export class SearchRolesDto {
   @IsOptional()
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   name?: string;
 
   @IsOptional()

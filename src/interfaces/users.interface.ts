@@ -1,9 +1,9 @@
 export interface IUserInterface {
-  _id: string;
+  id: string;
   username: string;
 }
 
 export interface IUpdateUserRefreshToken {
-  _id: string;
+  id: string;
   refreshToken: string;
 }

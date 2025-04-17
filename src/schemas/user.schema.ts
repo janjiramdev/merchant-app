@@ -2,8 +2,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import { EUserGender } from 'src/enums/user.enum';
 
-export type UserDocument = HydratedDocument<User>;
-
 @Schema({ collection: 'users' })
 export class User {
   @Prop({ type: String, unique: false, required: true, nullable: false })
@@ -72,6 +70,7 @@ export class User {
   deletedAt: Date;
 }
 
+export type UserDocument = HydratedDocument<User>;
 export const UserSchema = SchemaFactory.createForClass(User);
 export type UserWithId = User & {
   _id: Types.ObjectId;

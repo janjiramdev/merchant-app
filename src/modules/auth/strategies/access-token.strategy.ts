@@ -11,11 +11,13 @@ export class AccessTokenStrategy extends PassportStrategy(Strategy, 'jwt') {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get('JWT_ACCESS_TOKEN_SECRET') as string,
+      secretOrKey: configService.get<string>(
+        'JWT_ACCESS_TOKEN_SECRET',
+      ) as string,
     });
   }
 
   validate(payload: ITokenValidateInput): IUserInterface {
-    return { _id: payload.sub, username: payload.username };
+    return { id: payload.sub, username: payload.username };
   }
 }

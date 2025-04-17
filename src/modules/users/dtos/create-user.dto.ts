@@ -1,4 +1,12 @@
-import { IsNotEmpty, IsNumber, IsString, Matches, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  Matches,
+  Min,
+} from 'class-validator';
+import { EUserGender } from 'src/enums/user.enum';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -7,7 +15,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsString()
-  @Matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/)
+  @Matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/)
   password: string;
 
   @IsNotEmpty()
@@ -19,11 +27,11 @@ export class CreateUserDto {
   lastname: string;
 
   @IsNotEmpty()
+  @IsEnum(EUserGender)
+  gender: EUserGender;
+
+  @IsNotEmpty()
   @IsNumber()
   @Min(1)
   age: number;
-
-  @IsNotEmpty()
-  @IsString()
-  role: string;
 }

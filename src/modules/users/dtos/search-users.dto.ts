@@ -1,4 +1,6 @@
-import { IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { EUserGender } from 'src/enums/user.enum';
 
 export class SearchUsersDto {
   @IsOptional()
@@ -14,11 +16,12 @@ export class SearchUsersDto {
   lastname?: string;
 
   @IsOptional()
-  @IsNumber()
-  @Min(1)
-  age?: number;
+  @IsEnum(EUserGender)
+  gender?: EUserGender;
 
   @IsOptional()
-  @IsString()
-  role?: string;
+  @IsNumber()
+  @Type(() => Number)
+  @Min(1)
+  age?: number;
 }

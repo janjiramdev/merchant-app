@@ -7,15 +7,18 @@ import {
 import { UsersService } from 'src/modules/users/users.service';
 import { compare } from 'bcrypt';
 import { LoginDto } from './dtos/login.dto';
-import { IGenerateTokensInput, ITokens } from 'src/interfaces/auth.interface';
+import { ITokens } from 'src/interfaces/auth.interface';
 import { JwtService } from '@nestjs/jwt';
 import { UserWithId } from 'src/schemas/user.schema';
 import { ConfigService } from '@nestjs/config';
 import { IUserInterface } from 'src/interfaces/users.interface';
+import { throwException } from 'src/utils/exception.util';
+
+const className = 'AuthService';
 
 @Injectable()
 export class AuthService {
-  private readonly logger = new Logger('AuthService');
+  private readonly logger = new Logger(className);
 
   constructor(
     private readonly usersService: UsersService,
@@ -23,75 +26,120 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async validateUser(args: LoginDto): Promise<UserWithId> {
-    this.logger.log('validateUser args:', args);
+  private async validateUser(args: LoginDto): Promise<UserWithId> {
+    const methodName = 'validateUser';
+    this.logger.log(methodName, 'args:', args);
 
     const { username, password } = args;
 
-    const user = await this.usersService.getValidateUser(username);
-    if (!user)
-      throw new NotFoundException(`user with username: ${username} not found`);
-    const comparedPassword = await compare(password, user.password);
-    if (!comparedPassword) throw new BadRequestException('invalid password');
+    try {
+      const user = await this.usersService.getValidateUser(username);
+      if (!user)
+        throw new NotFoundException(
+          `user with username: ${username} not found`,
+        );
 
-    return user;
+      const comparedPassword = await compare(password, user.password);
+      if (!comparedPassword) throw new BadRequestException('invalid password');
+
+      return user;
+    } catch (err) {
+      throwException({
+        className,
+        methodName,
+        err,
+      });
+      throw err;
+    }
   }
 
-  async generateTokens(args: IGenerateTokensInput): Promise<ITokens> {
-    this.logger.log('generateTokens args:', args);
+  private async generateTokens(args: IUserInterface): Promise<ITokens> {
+    const methodName = 'generateTokens';
+    this.logger.log(methodName, 'args:', args);
 
-    const { _id, username } = args;
+    const { id, username } = args;
 
-    const accessToken = await this.jwtService.signAsync(
-      { sub: _id, username },
-      {
-        secret: this.configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),
-        expiresIn: this.configService.get<string>(
-          'JWT_ACCESS_TOKEN_EXPIRE_TIME',
-        ),
-      },
-    );
-    const refreshToken = await this.jwtService.signAsync(
-      { sub: _id, username },
-      {
-        secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
-        expiresIn: this.configService.get<string>(
-          'JWT_REFRESH_TOKEN_EXPIRE_TIME',
-        ),
-      },
-    );
+    try {
+      const accessToken = await this.jwtService.signAsync(
+        { sub: id, username },
+        {
+          secret: this.configService.get<string>('JWT_ACCESS_TOKEN_SECRET'),
+          expiresIn: this.configService.get<string>(
+            'JWT_ACCESS_TOKEN_EXPIRE_TIME',
+          ),
+        },
+      );
+      const refreshToken = await this.jwtService.signAsync(
+        { sub: id, username },
+        {
+          secret: this.configService.get<string>('JWT_REFRESH_TOKEN_SECRET'),
+          expiresIn: this.configService.get<string>(
+            'JWT_REFRESH_TOKEN_EXPIRE_TIME',
+          ),
+        },
+      );
 
-    return { accessToken, refreshToken };
+      return { accessToken, refreshToken };
+    } catch (err) {
+      throwException({
+        className,
+        methodName,
+        err,
+      });
+      throw err;
+    }
   }
 
   async login(args: LoginDto): Promise<ITokens> {
-    this.logger.log('login args:', args);
+    const methodName = 'login';
+    this.logger.log(methodName, 'args:', args);
 
-    const validatedUser = await this.validateUser(args);
-    const tokens = await this.generateTokens({
-      _id: validatedUser._id.toString(),
-      username: validatedUser.username,
-    });
-    await this.usersService.updateUserRefreshToken({
-      _id: validatedUser._id.toString(),
-      refreshToken: tokens.refreshToken,
-    });
+    try {
+      const validatedUser = await this.validateUser(args);
+      const tokens = await this.generateTokens({
+        id: validatedUser._id.toString(),
+        username: validatedUser.username,
+      });
+      await this.usersService.updateUserRefreshToken({
+        id: validatedUser._id.toString(),
+        refreshToken: tokens.refreshToken,
+      });
 
-    return tokens;
+      return tokens;
+    } catch (err) {
+      throwException({
+        className,
+        methodName,
+        err,
+      });
+      throw err;
+    }
   }
 
   async refreshToken(args: IUserInterface): Promise<ITokens> {
-    this.logger.log('refreshToken args:', args);
+    const methodName = 'refreshToken';
+    this.logger.log(methodName, 'args:', args);
 
-    const { _id, username } = args;
-    const tokens = await this.generateTokens({
-      _id,
-      username,
-    });
-    await this.usersService.updateUserRefreshToken({
-      _id,
-      refreshToken: tokens.refreshToken,
-    });
-    return tokens;
+    const { id, username } = args;
+
+    try {
+      const tokens = await this.generateTokens({
+        id,
+        username,
+      });
+      await this.usersService.updateUserRefreshToken({
+        id,
+        refreshToken: tokens.refreshToken,
+      });
+
+      return tokens;
+    } catch (err) {
+      throwException({
+        className,
+        methodName,
+        err,
+      });
+      throw err;
+    }
   }
 }

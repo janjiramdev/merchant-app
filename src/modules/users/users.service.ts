@@ -12,13 +12,14 @@ import { throwException } from 'src/utils/exception.util';
 import { SearchUsersDto } from './dtos/search-users.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { IUpdateUserRefreshToken } from 'src/interfaces/users.interface';
-import { hashData } from 'src/utils/hash.util';
+import { hashData } from 'src/utils/crypto.util';
+import { cleanObject } from 'src/utils/object.util';
 
 const className = 'UsersService';
 
 @Injectable()
 export class UsersService {
-  private readonly logger = new Logger('UsersService');
+  private readonly logger = new Logger(className);
 
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
@@ -28,8 +29,7 @@ export class UsersService {
     const methodName = 'createUser';
     this.logger.log(methodName, 'createUserDto:', createUserDto);
 
-    const { username, password, firstname, lastname, age, role } =
-      createUserDto;
+    const { username, password } = createUserDto;
 
     try {
       const user = await this.userModel.findOne({ username, deletedAt: null });
@@ -38,19 +38,19 @@ export class UsersService {
           `user with username: ${username} already in use`,
         );
 
-      const hashedPassword: string = await hashData(password);
-
-      return await this.userModel.create({
-        username,
-        password: hashedPassword,
-        firstname,
-        lastname,
-        age,
-        role,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        deletedAt: null,
-      });
+      return await this.userModel
+        .create({
+          ...createUserDto,
+          password: await hashData(password),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          deletedAt: null,
+        })
+        .then((result) => {
+          const formattedResult = result.toObject() as Record<string, any>;
+          delete formattedResult.password;
+          return formattedResult as User;
+        });
     } catch (err) {
       throwException({
         className,
@@ -65,18 +65,11 @@ export class UsersService {
     const methodName = 'searchUsers';
     this.logger.log(methodName, 'args:', args);
 
-    const { username, firstname, lastname, age, role } = args;
-
     try {
-      let filterObject = {};
-      if (username) filterObject = { ...filterObject, username };
-      if (firstname) filterObject = { ...filterObject, firstname };
-      if (lastname) filterObject = { ...filterObject, lastname };
-      if (age) filterObject = { ...filterObject, age };
-      if (role) filterObject = { ...filterObject, role };
-      filterObject = { ...filterObject, deletedAt: null };
+      const cleanedObject = cleanObject(args);
+      const filterObject = { ...cleanedObject, deletedAt: null };
 
-      return await this.userModel.find(filterObject).populate('role').exec();
+      return await this.userModel.find(filterObject).exec();
     } catch (err) {
       throwException({
         className,
@@ -94,7 +87,7 @@ export class UsersService {
     const methodName = 'updateUserById';
     this.logger.log(methodName, 'id:', id, 'updateUserDto:', updateUserDto);
 
-    const { password, firstname, lastname, age, role } = updateUserDto;
+    const { password } = updateUserDto;
 
     try {
       const findById = await this.userModel.findOne({
@@ -103,17 +96,14 @@ export class UsersService {
       });
       if (!findById) throw new NotFoundException(`user id: ${id} not found`);
 
-      if (!password && !firstname && !lastname && !age && !role)
+      const cleanedObject = cleanObject(updateUserDto);
+      if (!Object.values(cleanedObject).length)
         throw new BadRequestException(
           `updateUser detail not found: ${JSON.stringify(updateUserDto)}`,
         );
 
-      const updateObject: Partial<UpdateUserDto> = {};
+      const updateObject = { ...cleanedObject, updatedAt: new Date() };
       if (password) updateObject.password = await hashData(password);
-      if (firstname) updateObject.firstname = firstname;
-      if (lastname) updateObject.lastname = lastname;
-      if (age) updateObject.age = age;
-      if (role) updateObject.role = role;
 
       return (await this.userModel
         .findOneAndUpdate({ _id: id }, updateObject, { new: true })
@@ -150,19 +140,44 @@ export class UsersService {
   }
 
   async getValidateUser(username: string): Promise<UserWithId | null> {
-    this.logger.log('getValidateUser username:', username);
-    return await this.userModel
-      .findOne(
-        { username },
-        { _id: true, username: true, password: true, refreshToken: true },
-      )
-      .exec();
+    const methodName = 'getValidateUser';
+    this.logger.log(methodName, 'username:', username);
+
+    try {
+      return await this.userModel
+        .findOne(
+          { username },
+          { _id: true, username: true, password: true, refreshToken: true },
+        )
+        .exec();
+    } catch (err) {
+      throwException({
+        className,
+        methodName,
+        err,
+      });
+      throw err;
+    }
   }
 
   async updateUserRefreshToken(args: IUpdateUserRefreshToken): Promise<void> {
-    this.logger.log('updateUserRefreshToken args:', args);
-    const { _id, refreshToken } = args;
-    const hashed = await hashData(refreshToken);
-    await this.userModel.findOneAndUpdate({ _id }, { refreshToken: hashed });
+    const methodName = 'updateUserRefreshToken';
+    this.logger.log(methodName, 'args:', args);
+
+    const { id, refreshToken } = args;
+
+    try {
+      await this.userModel.findOneAndUpdate(
+        { _id: id },
+        { refreshToken: await hashData(refreshToken), updatedAt: new Date() },
+      );
+    } catch (err) {
+      throwException({
+        className,
+        methodName,
+        err,
+      });
+      throw err;
+    }
   }
 }

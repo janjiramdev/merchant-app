@@ -87,8 +87,6 @@ export class UsersService {
     const methodName = 'updateUserById';
     this.logger.log(methodName, 'id:', id, 'updateUserDto:', updateUserDto);
 
-    const { password } = updateUserDto;
-
     try {
       const findById = await this.userModel.findOne({
         _id: id,
@@ -103,7 +101,8 @@ export class UsersService {
         );
 
       const updateObject = { ...cleanedObject, updatedAt: new Date() };
-      if (password) updateObject.password = await hashData(password);
+      if (cleanedObject.password)
+        updateObject.password = await hashData(cleanedObject.password);
 
       return (await this.userModel
         .findOneAndUpdate({ _id: id }, updateObject, { new: true })

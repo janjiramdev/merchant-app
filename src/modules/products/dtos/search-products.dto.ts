@@ -1,14 +1,22 @@
 import { Type } from 'class-transformer';
-import { IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 
 export class SearchProductDto {
   @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  name?: string;
+  name?: string | Record<string, unknown>;
 
   @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  description?: string | object;
+  description?: string | Record<string, unknown>;
 
   @IsOptional()
   @IsNumber()

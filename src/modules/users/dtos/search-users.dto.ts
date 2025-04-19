@@ -1,19 +1,29 @@
 import { Type } from 'class-transformer';
-import { IsEnum, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from 'class-validator';
 import { EUserGender } from 'src/enums/users.enum';
 
 export class SearchUsersDto {
   @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  username?: string;
+  username?: string | Record<string, unknown>;
 
   @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  firstname?: string;
+  firstname?: string | Record<string, unknown>;
 
   @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  lastname?: string;
+  lastname?: string | Record<string, unknown>;
 
   @IsOptional()
   @IsEnum(EUserGender)

@@ -1,5 +1,21 @@
-export const cleanObject = <T>(obj: T): T => {
-  return Object.fromEntries(
-    Object.entries(obj as object).filter((entrie) => entrie[1] !== undefined),
-  ) as T;
+import { ECleanObjectType } from 'src/enums/utils.enum';
+import { ICleanObjectInput } from 'src/interfaces/utils.interface';
+
+export const cleanObject = <T>(args: ICleanObjectInput<T>): T => {
+  const { obj, objectType } = args;
+
+  const cleanedObj = Object.fromEntries(
+    Object.entries(obj as Record<string, unknown>).filter(
+      ([, value]) => value !== undefined,
+    ),
+  );
+
+  if (objectType === ECleanObjectType.SEARCH) {
+    const formatted: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(cleanedObj)) {
+      formatted[key] =
+        typeof value === 'string' ? { $regex: value, $options: 'i' } : value;
+    }
+    return formatted as T;
+  } else return cleanedObj as T;
 };

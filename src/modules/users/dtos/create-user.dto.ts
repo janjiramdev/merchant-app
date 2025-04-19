@@ -6,7 +6,7 @@ import {
   Matches,
   Min,
 } from 'class-validator';
-import { EUserGender } from 'src/enums/user.enum';
+import { EUserGender } from 'src/enums/users.enum';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -26,11 +26,9 @@ export class CreateUserDto {
   @IsString()
   lastname: string;
 
-  @IsNotEmpty()
   @IsEnum(EUserGender)
   gender: EUserGender;
 
-  @IsNotEmpty()
   @IsNumber()
   @Min(1)
   age: number;

@@ -6,6 +6,7 @@ export class CreateProductDto {
   name: string;
 
   @IsOptional()
+  @IsNotEmpty()
   @IsString()
   description?: string;
 }

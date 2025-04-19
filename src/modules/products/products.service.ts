@@ -13,6 +13,7 @@ import { SearchProductDto } from './dtos/search-products.dto';
 import { cleanObject } from 'src/utils/object.util';
 import { UpdateProductDto } from './dtos/update-product.dto';
 import { IUserInterface } from 'src/interfaces/users.interface';
+import { ECleanObjectType } from 'src/enums/utils.enum';
 
 const className = 'ProductsService';
 
@@ -78,7 +79,10 @@ export class ProductsService {
     this.logger.log(methodName, 'args:', args);
 
     try {
-      const cleanedObject = cleanObject(args);
+      const cleanedObject = cleanObject<SearchProductDto>({
+        obj: args,
+        objectType: ECleanObjectType.SEARCH,
+      });
       const filterObject = { ...cleanedObject, deletedAt: null };
 
       return await this.productModel.find(filterObject).exec();
@@ -115,7 +119,10 @@ export class ProductsService {
       });
       if (!findById) throw new NotFoundException(`product id: ${id} not found`);
 
-      const cleanedObject = cleanObject(updateProductDto);
+      const cleanedObject = cleanObject<UpdateProductDto>({
+        obj: updateProductDto,
+        objectType: ECleanObjectType.OTHERS,
+      });
       if (!Object.values(cleanedObject).length)
         throw new BadRequestException(
           `updateProduct detail not found: ${JSON.stringify(updateProductDto)}`,

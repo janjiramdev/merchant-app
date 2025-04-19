@@ -18,6 +18,7 @@ import {
 } from 'src/interfaces/users.interface';
 import { hashData } from 'src/utils/crypto.util';
 import { cleanObject } from 'src/utils/object.util';
+import { ECleanObjectType } from 'src/enums/utils.enum';
 
 const className = 'UsersService';
 
@@ -70,7 +71,10 @@ export class UsersService {
     this.logger.log(methodName, 'args:', args);
 
     try {
-      const cleanedObject = cleanObject(args);
+      const cleanedObject = cleanObject<SearchUsersDto>({
+        obj: args,
+        objectType: ECleanObjectType.SEARCH,
+      });
       const filterObject = { ...cleanedObject, deletedAt: null };
 
       return await this.userModel.find(filterObject).exec();
@@ -112,7 +116,10 @@ export class UsersService {
       });
       if (!findById) throw new NotFoundException(`user id: ${id} not found`);
 
-      const cleanedObject = cleanObject(updateUserDto);
+      const cleanedObject = cleanObject<UpdateUserDto>({
+        obj: updateUserDto,
+        objectType: ECleanObjectType.OTHERS,
+      });
       if (!Object.values(cleanedObject).length)
         throw new BadRequestException(
           `updateUser detail not found: ${JSON.stringify(updateUserDto)}`,
@@ -172,7 +179,7 @@ export class UsersService {
     try {
       return await this.userModel
         .findOne(
-          { username },
+          { username, deletedAt: null },
           { _id: true, username: true, password: true, refreshToken: true },
         )
         .exec();

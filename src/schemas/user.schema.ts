@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { EUserGender } from 'src/enums/user.enum';
+import { EUserGender } from 'src/enums/users.enum';
 
 @Schema({ collection: 'users' })
 export class User {

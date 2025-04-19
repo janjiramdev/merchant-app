@@ -17,6 +17,8 @@ import { IApiResponse } from 'src/interfaces/api.interface';
 import { SearchUsersDto } from './dtos/search-users.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { AccessTokenGuard } from 'src/modules/auth/guards/access-token.guard';
+import { CurrentUser } from 'src/decorators/current-user.decorator';
+import { IUserInterface } from 'src/interfaces/users.interface';
 
 @Controller('users')
 export class UsersController {
@@ -48,18 +50,22 @@ export class UsersController {
   async updateUserById(
     @Param('id') id: string,
     @Body() body: UpdateUserDto,
+    @CurrentUser() user: IUserInterface,
   ): Promise<IApiResponse<User>> {
-    this.logger.log('updateUserById id:', id, 'body:', body);
-    const response = await this.usersService.updateUserById(id, body);
+    this.logger.log('updateUserById id:', id, 'body:', body, 'user:', user);
+    const response = await this.usersService.updateUserById(id, body, user);
     this.logger.log('updateUserById response:', response);
     return { data: response };
   }
 
   @UseGuards(AccessTokenGuard)
   @Delete(':id')
-  async deleteUserById(@Param('id') id: string): Promise<IApiResponse<User>> {
-    this.logger.log('deleteUserById id:', id);
-    const response = await this.usersService.deleteUserById(id);
+  async deleteUserById(
+    @Param('id') id: string,
+    @CurrentUser() user: IUserInterface,
+  ): Promise<IApiResponse<User>> {
+    this.logger.log('deleteUserById id:', id, 'user:', user);
+    const response = await this.usersService.deleteUserById(id, user);
     this.logger.log('deleteUserById response:', response);
     return { data: response };
   }

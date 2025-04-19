@@ -6,7 +6,7 @@ import {
   Matches,
   Min,
 } from 'class-validator';
-import { EUserGender } from 'src/enums/user.enum';
+import { EUserGender } from 'src/enums/users.enum';
 
 export class UpdateUserDto {
   @IsOptional()

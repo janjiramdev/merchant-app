@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
@@ -11,7 +12,10 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { throwException } from 'src/utils/exception.util';
 import { SearchUsersDto } from './dtos/search-users.dto';
 import { UpdateUserDto } from './dtos/update-user.dto';
-import { IUpdateUserRefreshToken } from 'src/interfaces/users.interface';
+import {
+  IUpdateUserRefreshToken,
+  IUserInterface,
+} from 'src/interfaces/users.interface';
 import { hashData } from 'src/utils/crypto.util';
 import { cleanObject } from 'src/utils/object.util';
 
@@ -83,11 +87,25 @@ export class UsersService {
   async updateUserById(
     id: string,
     updateUserDto: UpdateUserDto,
+    user: IUserInterface,
   ): Promise<User> {
     const methodName = 'updateUserById';
-    this.logger.log(methodName, 'id:', id, 'updateUserDto:', updateUserDto);
+    this.logger.log(
+      methodName,
+      'id:',
+      id,
+      'updateUserDto:',
+      updateUserDto,
+      'user:',
+      user,
+    );
 
     try {
+      if (id !== user.id)
+        throw new ForbiddenException(
+          'you are not allowed to update this product',
+        );
+
       const findById = await this.userModel.findOne({
         _id: id,
         deletedAt: null,
@@ -117,13 +135,22 @@ export class UsersService {
     }
   }
 
-  async deleteUserById(id: string): Promise<User> {
+  async deleteUserById(id: string, user: IUserInterface): Promise<User> {
     const methodName = 'deleteUserById';
-    this.logger.log(methodName, 'id:', id);
+    this.logger.log(methodName, 'id:', id, 'user:', user);
 
     try {
-      const user = await this.userModel.findOne({ _id: id, deletedAt: null });
-      if (!user) throw new NotFoundException(`user with id: ${id} not found`);
+      if (id !== user.id)
+        throw new ForbiddenException(
+          'you are not allowed to update this product',
+        );
+
+      const findById = await this.userModel.findOne({
+        _id: id,
+        deletedAt: null,
+      });
+      if (!findById)
+        throw new NotFoundException(`user with id: ${id} not found`);
 
       return (await this.userModel
         .findOneAndUpdate({ _id: id }, { deletedAt: new Date() }, { new: true })

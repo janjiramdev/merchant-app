@@ -82,6 +82,3 @@ export class Product {
 
 export type ProductDocument = HydratedDocument<Product>;
 export const ProductSchema = SchemaFactory.createForClass(Product);
-export type ProductWithId = Product & {
-  _id: Types.ObjectId;
-};

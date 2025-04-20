@@ -9,7 +9,7 @@ import { compare } from 'bcrypt';
 import { LoginDto } from './dtos/login.dto';
 import { ITokens } from 'src/interfaces/auth.interface';
 import { JwtService } from '@nestjs/jwt';
-import { UserWithId } from 'src/schemas/user.schema';
+import { UserDocument } from 'src/schemas/user.schema';
 import { ConfigService } from '@nestjs/config';
 import { IUserInterface } from 'src/interfaces/users.interface';
 import { throwException } from 'src/utils/exception.util';
@@ -26,7 +26,7 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  private async validateUser(args: LoginDto): Promise<UserWithId> {
+  private async validateUser(args: LoginDto): Promise<UserDocument> {
     const methodName = 'validateUser';
     this.logger.log(methodName, 'args:', args);
 

@@ -9,7 +9,9 @@ export class UpdateProductDto {
   @IsOptional()
   @IsString()
   description?: string;
+}
 
+export class UpdateProductInternalDto extends UpdateProductDto {
   @IsOptional()
   @IsNumber()
   @Min(0)

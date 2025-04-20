@@ -6,12 +6,12 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
-import { Product } from 'src/schemas/product.schema';
+import { Product, ProductDocument } from 'src/schemas/product.schema';
 import { CreateProductDto } from './dtos/create-product.dto';
 import { throwException } from 'src/utils/exception.util';
 import { SearchProductDto } from './dtos/search-products.dto';
 import { cleanObject } from 'src/utils/object.util';
-import { UpdateProductDto } from './dtos/update-product.dto';
+import { UpdateProductInternalDto } from './dtos/update-product.dto';
 import { IUserInterface } from 'src/interfaces/users.interface';
 import { ECleanObjectType } from 'src/enums/utils.enum';
 
@@ -98,7 +98,7 @@ export class ProductsService {
 
   async updateProductById(
     id: string,
-    updateProductDto: UpdateProductDto,
+    updateProductDto: UpdateProductInternalDto,
     user: IUserInterface,
   ): Promise<Product> {
     const methodName = 'updateProductById';
@@ -119,7 +119,7 @@ export class ProductsService {
       });
       if (!findById) throw new NotFoundException(`product id: ${id} not found`);
 
-      const cleanedObject = cleanObject<UpdateProductDto>({
+      const cleanedObject = cleanObject<UpdateProductInternalDto>({
         obj: updateProductDto,
         objectType: ECleanObjectType.OTHERS,
       });
@@ -178,6 +178,34 @@ export class ProductsService {
           { new: true },
         )
         .exec()) as Product;
+    } catch (err) {
+      throwException({
+        className,
+        methodName,
+        err,
+      });
+      throw err;
+    }
+  }
+
+  async getProductById(
+    id: string,
+    user: IUserInterface,
+  ): Promise<ProductDocument> {
+    const methodName = 'getProductById';
+    this.logger.log(methodName, 'id:', id, 'user:', user);
+
+    try {
+      const product = await this.productModel
+        .findOne({
+          _id: id,
+          deletedAt: null,
+        })
+        .exec();
+      if (!product)
+        throw new NotFoundException(`product with id: ${id} not found`);
+
+      return product;
     } catch (err) {
       throwException({
         className,

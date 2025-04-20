@@ -4,7 +4,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ProductsModule } from './modules/products/products.module';
-
+import { StockAdjustmentModule } from './modules/stock-adjustment/stock-adjustment.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -20,7 +20,7 @@ import { ProductsModule } from './modules/products/products.module';
     UsersModule,
     AuthModule,
     ProductsModule,
+    StockAdjustmentModule,
   ],
-  providers: [],
 })
 export class AppModule {}

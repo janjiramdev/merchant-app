@@ -1,7 +1,7 @@
 // Hold
 
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+import { HydratedDocument } from 'mongoose';
 
 @Schema({ collection: 'roles' })
 export class Role {
@@ -45,6 +45,3 @@ export class Role {
 
 export type RolesDocument = HydratedDocument<Role>;
 export const RoleSchema = SchemaFactory.createForClass(Role);
-export type RoleWithId = Role & {
-  _id: Types.ObjectId;
-};

@@ -60,7 +60,7 @@ export class StockAdjustmentService {
         productId: product._id,
         quantity: adjustStockDto.quantity,
         adjustType: adjustStockDto.adjustType,
-        createdBy: user.id,
+        createdBy: new Types.ObjectId(user.id),
         createdAt: new Date(),
       });
     } catch (err) {

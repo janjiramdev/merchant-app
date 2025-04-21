@@ -55,7 +55,6 @@ export class ProductsService {
       return await this.productModel.create({
         ...createProductDto,
         currentStock: 0,
-        price: 0,
         totalSales: 0,
         createdBy: new Types.ObjectId(user.id),
         updatedBy: new Types.ObjectId(user.id),

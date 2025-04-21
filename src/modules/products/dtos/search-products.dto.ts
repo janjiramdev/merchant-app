@@ -26,7 +26,7 @@ export class SearchProductDto {
 
   @IsOptional()
   @IsNumber()
-  @Min(0)
+  @Min(1)
   @Type(() => Number)
   price?: number;
 

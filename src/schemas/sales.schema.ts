@@ -1,11 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
-import { EStockAdjustType } from 'src/enums/stock-adjustment.enum';
-import { User } from './user.schema';
 import { Product } from './product.schema';
+import { User } from './user.schema';
 
-@Schema({ collection: 'stockAdjustment' })
-export class StockAdjustment {
+@Schema({ collection: 'sales' })
+export class Sales {
   @Prop({
     type: Types.ObjectId,
     unique: false,
@@ -15,17 +14,11 @@ export class StockAdjustment {
   })
   productId: Product;
 
-  @Prop({
-    type: String,
-    enum: EStockAdjustType,
-    unique: false,
-    required: true,
-    nullable: false,
-  })
-  adjustType: EStockAdjustType;
-
   @Prop({ type: Number, unique: false, required: true, nullable: false })
   quantity: number;
+
+  @Prop({ type: Number, unique: false, required: true, nullable: false })
+  totalPrice: number;
 
   // ----- ----- ----- Action User ----- ----- ----- //
 
@@ -49,6 +42,5 @@ export class StockAdjustment {
   createdAt: Date;
 }
 
-export type StockAdjustmentDocument = HydratedDocument<StockAdjustment>;
-export const StockAdjustmentSchema =
-  SchemaFactory.createForClass(StockAdjustment);
+export type SalesDocument = HydratedDocument<Sales>;
+export const SalesSchema = SchemaFactory.createForClass(Sales);

@@ -5,6 +5,8 @@ import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { ProductsModule } from './modules/products/products.module';
 import { StockAdjustmentModule } from './modules/stock-adjustment/stock-adjustment.module';
+import { SalesModule } from './modules/sales/sales.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -21,6 +23,7 @@ import { StockAdjustmentModule } from './modules/stock-adjustment/stock-adjustme
     AuthModule,
     ProductsModule,
     StockAdjustmentModule,
+    SalesModule,
   ],
 })
 export class AppModule {}

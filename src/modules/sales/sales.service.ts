@@ -24,11 +24,11 @@ export class SalesService {
     const methodName = 'sale';
     this.logger.log(methodName, 'saleDto:', saleDto, 'user:', user);
 
-    const { quantity } = saleDto;
+    const { productId, quantity } = saleDto;
 
     try {
       const product = await this.productsService.getProductById(
-        saleDto.productId,
+        productId,
         user,
       );
 
@@ -47,8 +47,8 @@ export class SalesService {
       );
 
       return await this.salesModel.create({
-        productId: product._id,
-        quantity: saleDto.quantity,
+        product: product._id,
+        quantity,
         totalPrice,
         createdBy: new Types.ObjectId(user.id),
         createdAt: new Date(),
@@ -71,8 +71,7 @@ export class SalesService {
 
     try {
       let filterObject = {};
-      if (productId)
-        filterObject = { productId: new Types.ObjectId(productId) };
+      if (productId) filterObject = { product: new Types.ObjectId(productId) };
       if (quantity !== undefined) filterObject = { ...filterObject, quantity };
       if (totalPrice !== undefined)
         filterObject = { ...filterObject, totalPrice };

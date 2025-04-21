@@ -34,17 +34,17 @@ export class StockAdjustmentService {
       user,
     );
 
+    const { productId, adjustType, quantity } = adjustStockDto;
+
     try {
       const product = await this.productsService.getProductById(
-        adjustStockDto.productId,
+        productId,
         user,
       );
       let newStock = product.currentStock ?? 0;
 
-      if (adjustStockDto.adjustType === EStockAdjustType.ADD)
-        newStock += adjustStockDto.quantity;
-      else if (adjustStockDto.adjustType === EStockAdjustType.REMOVE)
-        newStock -= adjustStockDto.quantity;
+      if (adjustType === EStockAdjustType.ADD) newStock += quantity;
+      else if (adjustType === EStockAdjustType.REMOVE) newStock -= quantity;
 
       if (newStock < 0)
         throw new BadRequestException(
@@ -57,9 +57,9 @@ export class StockAdjustmentService {
       );
 
       return await this.stockAdjustmentModel.create({
-        productId: product._id,
-        quantity: adjustStockDto.quantity,
-        adjustType: adjustStockDto.adjustType,
+        product: product._id,
+        quantity,
+        adjustType,
         createdBy: new Types.ObjectId(user.id),
         createdAt: new Date(),
       });
@@ -83,8 +83,7 @@ export class StockAdjustmentService {
 
     try {
       let filterObject = {};
-      if (productId)
-        filterObject = { productId: new Types.ObjectId(productId) };
+      if (productId) filterObject = { product: new Types.ObjectId(productId) };
       if (adjustType) filterObject = { ...filterObject, adjustType };
       if (quantity !== undefined) filterObject = { ...filterObject, quantity };
 

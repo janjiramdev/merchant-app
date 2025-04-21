@@ -12,7 +12,7 @@ export class Sales {
     nullable: false,
     ref: 'Product',
   })
-  productId: Product;
+  product: Product;
 
   @Prop({ type: Number, unique: false, required: true, nullable: false })
   quantity: number;

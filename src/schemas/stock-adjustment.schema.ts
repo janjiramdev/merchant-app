@@ -13,7 +13,7 @@ export class StockAdjustment {
     nullable: false,
     ref: 'Product',
   })
-  productId: Product;
+  product: Product;
 
   @Prop({
     type: String,

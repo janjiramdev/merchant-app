@@ -46,7 +46,7 @@ export class UsersService {
       return await this.userModel
         .create({
           ...createUserDto,
-          password: await hashData(password),
+          password: hashData(password),
           createdAt: new Date(),
           updatedAt: new Date(),
           deletedAt: null,
@@ -132,7 +132,7 @@ export class UsersService {
 
       const updateObject = { ...cleanedObject, updatedAt: new Date() };
       if (cleanedObject.password)
-        updateObject.password = await hashData(cleanedObject.password);
+        updateObject.password = hashData(cleanedObject.password);
 
       return (await this.userModel
         .findOneAndUpdate({ _id: id }, updateObject, { new: true })
@@ -207,7 +207,7 @@ export class UsersService {
     try {
       await this.userModel.findOneAndUpdate(
         { _id: id },
-        { refreshToken: await hashData(refreshToken), updatedAt: new Date() },
+        { refreshToken: hashData(refreshToken), updatedAt: new Date() },
       );
     } catch (err) {
       throwException({

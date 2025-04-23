@@ -5,7 +5,6 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { UsersService } from 'src/modules/users/users.service';
-import { compare } from 'bcrypt';
 import { LoginDto } from './dtos/login.dto';
 import { ITokens } from 'src/interfaces/auth.interface';
 import { JwtService } from '@nestjs/jwt';
@@ -13,6 +12,7 @@ import { UserDocument } from 'src/schemas/user.schema';
 import { ConfigService } from '@nestjs/config';
 import { IUserInterface } from 'src/interfaces/users.interface';
 import { throwException } from 'src/utils/exception.util';
+import { compareData } from 'src/utils/crypto.util';
 
 const className = 'AuthService';
 
@@ -39,7 +39,7 @@ export class AuthService {
           `user with username: ${username} not found`,
         );
 
-      const comparedPassword = await compare(password, user.password);
+      const comparedPassword = compareData(password, user.password);
       if (!comparedPassword) throw new BadRequestException('invalid password');
 
       return user;

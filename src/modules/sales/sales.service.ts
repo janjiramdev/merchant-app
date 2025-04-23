@@ -67,7 +67,7 @@ export class SalesService {
     const methodName = 'getSaleHistories';
     this.logger.log(methodName, 'args:', args);
 
-    const { productId, quantity, totalPrice } = args;
+    const { productId, quantity, totalPrice, sortBy, sortDirection } = args;
 
     try {
       let filterObject = {};
@@ -76,7 +76,10 @@ export class SalesService {
       if (totalPrice !== undefined)
         filterObject = { ...filterObject, totalPrice };
 
-      return await this.salesModel.find(filterObject).exec();
+      return await this.salesModel
+        .find(filterObject)
+        .sort([[sortBy, sortDirection]])
+        .exec();
     } catch (err) {
       throwException({
         className,

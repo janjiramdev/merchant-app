@@ -17,10 +17,10 @@ export class User {
   password: string;
 
   @Prop({ type: String, unique: false, required: true, nullable: false })
-  firstname: string;
+  firstName: string;
 
   @Prop({ type: String, unique: false, required: true, nullable: false })
-  lastname: string;
+  lastName: string;
 
   @Prop({
     type: String,

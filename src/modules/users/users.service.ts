@@ -70,6 +70,8 @@ export class UsersService {
     const methodName = 'searchUsers';
     this.logger.log(methodName, 'args:', args);
 
+    const { sortBy, sortDirection } = args;
+
     try {
       const cleanedObject = cleanObject<SearchUsersDto>({
         obj: args,
@@ -77,7 +79,10 @@ export class UsersService {
       });
       const filterObject = { ...cleanedObject, deletedAt: null };
 
-      return await this.userModel.find(filterObject).exec();
+      return await this.userModel
+        .find(filterObject)
+        .sort([[sortBy, sortDirection]])
+        .exec();
     } catch (err) {
       throwException({
         className,

@@ -13,8 +13,9 @@ export const cleanObject = <T>(args: ICleanObjectInput<T>): T => {
   if (objectType === ECleanObjectType.SEARCH) {
     const formatted: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(cleanedObj)) {
-      formatted[key] =
-        typeof value === 'string' ? { $regex: value, $options: 'i' } : value;
+      if (!['sortBy', 'sortDirection'].includes(key))
+        formatted[key] =
+          typeof value === 'string' ? { $regex: value, $options: 'i' } : value;
     }
     return formatted as T;
   } else return cleanedObj as T;

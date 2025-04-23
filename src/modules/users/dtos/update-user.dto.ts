@@ -19,12 +19,12 @@ export class UpdateUserDto {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  firstname?: string;
+  firstName?: string;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  lastname?: string;
+  lastName?: string;
 
   @IsOptional()
   @IsEnum(EUserGender)

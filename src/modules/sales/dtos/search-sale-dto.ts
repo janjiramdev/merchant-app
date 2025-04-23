@@ -6,8 +6,9 @@ import {
   IsString,
   Min,
 } from 'class-validator';
+import { SortDto } from 'src/utils/sort.util';
 
-export class SearchSaleDto {
+export class SearchSaleDto extends SortDto {
   @IsOptional()
   @IsNotEmpty()
   @IsString()

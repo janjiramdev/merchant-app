@@ -77,6 +77,8 @@ export class ProductsService {
     const methodName = 'searchProducts';
     this.logger.log(methodName, 'args:', args);
 
+    const { sortBy, sortDirection } = args;
+
     try {
       const cleanedObject = cleanObject<SearchProductDto>({
         obj: args,
@@ -84,7 +86,12 @@ export class ProductsService {
       });
       const filterObject = { ...cleanedObject, deletedAt: null };
 
-      return await this.productModel.find(filterObject).exec();
+      return await this.productModel
+        .find(filterObject)
+        .populate('saleHistories')
+        .populate('stockAdjustHistories')
+        .sort([[sortBy, sortDirection]])
+        .exec();
     } catch (err) {
       throwException({
         className,

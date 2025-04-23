@@ -8,8 +8,9 @@ import {
   Min,
 } from 'class-validator';
 import { EUserGender } from 'src/enums/users.enum';
+import { SortDto } from 'src/utils/sort.util';
 
-export class SearchUsersDto {
+export class SearchUsersDto extends SortDto {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
@@ -18,12 +19,12 @@ export class SearchUsersDto {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  firstname?: string | Record<string, unknown>;
+  firstName?: string | Record<string, unknown>;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  lastname?: string | Record<string, unknown>;
+  lastName?: string | Record<string, unknown>;
 
   @IsOptional()
   @IsEnum(EUserGender)

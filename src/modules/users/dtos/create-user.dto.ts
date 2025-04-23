@@ -20,11 +20,11 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsString()
-  firstname: string;
+  firstName: string;
 
   @IsNotEmpty()
   @IsString()
-  lastname: string;
+  lastName: string;
 
   @IsEnum(EUserGender)
   gender: EUserGender;

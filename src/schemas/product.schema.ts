@@ -82,3 +82,21 @@ export class Product {
 
 export type ProductDocument = HydratedDocument<Product>;
 export const ProductSchema = SchemaFactory.createForClass(Product);
+
+// ----- ----- ----- Virtual fields ----- ----- ----- //
+
+ProductSchema.virtual('saleHistories', {
+  ref: 'Sales',
+  localField: '_id',
+  foreignField: 'product',
+});
+ProductSchema.set('toObject', { virtuals: true });
+ProductSchema.set('toJSON', { virtuals: true });
+
+ProductSchema.virtual('stockAdjustHistories', {
+  ref: 'StockAdjustment',
+  localField: '_id',
+  foreignField: 'product',
+});
+ProductSchema.set('toObject', { virtuals: true });
+ProductSchema.set('toJSON', { virtuals: true });

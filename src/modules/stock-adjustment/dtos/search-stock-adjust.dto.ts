@@ -8,8 +8,9 @@ import {
   Min,
 } from 'class-validator';
 import { EStockAdjustType } from 'src/enums/stock-adjustment.enum';
+import { SortDto } from 'src/utils/sort.util';
 
-export class SearchStockAdjustDto {
+export class SearchStockAdjustDto extends SortDto {
   @IsOptional()
   @IsNotEmpty()
   @IsString()

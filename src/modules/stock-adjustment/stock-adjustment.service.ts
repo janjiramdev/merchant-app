@@ -25,7 +25,7 @@ export class StockAdjustmentService {
     adjustStockDto: AdjustStockDto,
     user: IUserInterface,
   ): Promise<StockAdjustment> {
-    const methodName = 'addjustStock';
+    const methodName = 'adjustStock';
     this.logger.log(
       methodName,
       'adjustStockDto:',
@@ -79,7 +79,7 @@ export class StockAdjustmentService {
     const methodName = 'getStockAdjustHistories';
     this.logger.log(methodName, 'args:', args);
 
-    const { productId, adjustType, quantity } = args;
+    const { productId, adjustType, quantity, sortBy, sortDirection } = args;
 
     try {
       let filterObject = {};
@@ -87,7 +87,10 @@ export class StockAdjustmentService {
       if (adjustType) filterObject = { ...filterObject, adjustType };
       if (quantity !== undefined) filterObject = { ...filterObject, quantity };
 
-      return await this.stockAdjustmentModel.find(filterObject).exec();
+      return await this.stockAdjustmentModel
+        .find(filterObject)
+        .sort([[sortBy, sortDirection]])
+        .exec();
     } catch (err) {
       throwException({
         className,

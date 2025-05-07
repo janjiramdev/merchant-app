@@ -1,37 +1,43 @@
 # merchant-app
 
 ## Description
+This project create for test backend system with TypeScript + NestJS + MongoDB
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## Prerequisite
+- Node v20.x.x or later
+- MongoDB v8.0
+- Docker (Optional)
+- Use repository directory as terminal to run command and project
 
 ## Project setup
+- Create own MongoDB database or setup via docker
+```bash
+# Pull MongoDB image
+$ docker pull mongo:8.0
 
+# Run MongoDB container
+$ docker run -d -p <DATABASE_CONTAINER_EXPOSE_PORT>:27017 --name=<DATABASE_CONTAINER_NAME> mongo:8.0
+```
+- Config env follow up .env.example
+- Install NodeJS dependencies
 ```bash
 $ npm install
 ```
 
-## Compile and run the project
+## Run project
 
 ```bash
-# development
+# Development
 $ npm run start
 
-# watch mode
+# Watch mode
 $ npm run start:dev
-
-# production mode
-$ npm run start:prod
 ```
 
-## Run tests
-
+## Setup and run project via docker
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+$ docker-compose up -d
 ```
+
+## Author
+Janjira Mosamai

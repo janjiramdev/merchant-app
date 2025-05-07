@@ -9,7 +9,7 @@ import {
 import { UsersService } from 'src/modules/users/users.service';
 import { ConfigService } from '@nestjs/config';
 import { ITokenValidateInput } from 'src/interfaces/auth.interface';
-import { compare } from 'bcrypt';
+import { compareData } from 'src/utils/crypto.util';
 
 @Injectable()
 export class RefreshTokenStrategy extends PassportStrategy(
@@ -23,7 +23,9 @@ export class RefreshTokenStrategy extends PassportStrategy(
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: configService.get('JWT_REFRESH_TOKEN_SECRET') as string,
+      secretOrKey: configService.get<string>(
+        'JWT_REFRESH_TOKEN_SECRET',
+      ) as string,
       passReqToCallback: true,
     });
   }
@@ -33,10 +35,10 @@ export class RefreshTokenStrategy extends PassportStrategy(
     if (!refreshToken) throw new UnauthorizedException('refresh token missing');
 
     const user = await this.usersService.getValidateUser(payload.username);
-    const comparedToken = await compare(refreshToken, user?.refreshToken ?? '');
+    const comparedToken = compareData(refreshToken, user?.refreshToken ?? '');
     if (!user || !user.refreshToken || !comparedToken)
       throw new ForbiddenException('access denied');
 
-    return { ...payload };
+    return { id: payload.sub, username: payload.username };
   }
 }

@@ -1,14 +1,16 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { RolesModule } from './modules/roles/roles.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './modules/users/users.module';
 import { AuthModule } from './modules/auth/auth.module';
+import { ProductsModule } from './modules/products/products.module';
+import { StockAdjustmentModule } from './modules/stock-adjustment/stock-adjustment.module';
+import { SalesModule } from './modules/sales/sales.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: [`.env`],
+      envFilePath: ['.env'],
     }),
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
@@ -17,10 +19,11 @@ import { AuthModule } from './modules/auth/auth.module';
       }),
       inject: [ConfigService],
     }),
-    RolesModule,
     UsersModule,
     AuthModule,
+    ProductsModule,
+    StockAdjustmentModule,
+    SalesModule,
   ],
-  providers: [],
 })
 export class AppModule {}

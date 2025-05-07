@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  database:
+    image: mongo:8.0
+    container_name: merchant-database
+    ports:
+      - '27017:27017'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: P@ssw0rd
+      MONGO_INITDB_DATABASE: datasource
+    volumes:
+      - mongodb-data:/data/db
+    networks:
+      - mongodb-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: merchant-backend
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_URI: mongodb://root:P%40ssw0rd@database:27017/datasource?authSource=admin
+      JWT_ACCESS_TOKEN_SECRET: myultrasecretaccesskey
+      JWT_ACCESS_TOKEN_EXPIRE_TIME: 10m
+      JWT_REFRESH_TOKEN_SECRET: myultrasecretrefreshkey
+      JWT_REFRESH_TOKEN_EXPIRE_TIME: 1h
+    networks:
+      - mongodb-network
+
+volumes:
+  mongodb-data:
+
+networks:
+  mongodb-network:

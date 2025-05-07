@@ -1,3 +1,5 @@
+// Hold
+
 import {
   BadRequestException,
   Injectable,
@@ -16,7 +18,7 @@ const className = 'RolesService';
 
 @Injectable()
 export class RolesService {
-  private readonly logger = new Logger('RolesService');
+  private readonly logger = new Logger(className);
 
   constructor(
     @InjectModel(Role.name) private readonly roleModel: Model<Role>,
@@ -96,7 +98,7 @@ export class RolesService {
       if (!findById) throw new NotFoundException(`role id: ${id} not found`);
 
       const updateObject: UpdateRoleDto = {};
-      if (name) {
+      if (name)
         if (name !== findById.name) {
           const findByName = await this.roleModel.findOne({
             name,
@@ -107,8 +109,7 @@ export class RolesService {
               `role with name: ${name} already in use`,
             );
           else updateObject.name = name;
-        } else updateObject.name = name;
-      }
+        }
       if (userCount !== undefined) updateObject.userCount = userCount;
 
       return (await this.roleModel

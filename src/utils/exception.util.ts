@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   InternalServerErrorException,
   Logger,
   NotFoundException,
@@ -16,6 +17,9 @@ export const throwException = (args: IThrowExceptionInput) => {
   } else if (err instanceof NotFoundException) {
     logger.error(`${methodName} error: ${err.message}`);
     throw new NotFoundException(err.message);
+  } else if (err instanceof ForbiddenException) {
+    logger.error(`${methodName} error: ${err.message}`);
+    throw new ForbiddenException(err.message);
   } else if (err instanceof Error) {
     logger.error(`${methodName} error: ${err.message}`);
     throw new InternalServerErrorException(err.message);

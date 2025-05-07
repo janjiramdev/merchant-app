@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
-
-export type UserDocument = HydratedDocument<User>;
+import { HydratedDocument } from 'mongoose';
+import { EUserGender } from 'src/enums/users.enum';
 
 @Schema({ collection: 'users' })
 export class User {
@@ -18,22 +17,33 @@ export class User {
   password: string;
 
   @Prop({ type: String, unique: false, required: true, nullable: false })
-  firstname: string;
+  firstName: string;
 
   @Prop({ type: String, unique: false, required: true, nullable: false })
-  lastname: string;
+  lastName: string;
+
+  @Prop({
+    type: String,
+    enum: EUserGender,
+    unique: false,
+    required: true,
+    nullable: false,
+  })
+  gender: EUserGender;
 
   @Prop({ type: Number, unique: false, required: true, nullable: false })
   age: number;
 
   @Prop({
-    type: Types.ObjectId,
+    type: String,
     unique: false,
-    required: true,
-    nullable: false,
-    ref: 'Role',
+    required: false,
+    nullable: true,
+    select: false,
   })
-  role: number;
+  refreshToken?: string;
+
+  // ----- ----- ----- Timestamp ----- ----- ----- //
 
   @Prop({
     type: Date,
@@ -58,18 +68,7 @@ export class User {
     nullable: true,
   })
   deletedAt: Date;
-
-  @Prop({
-    type: String,
-    unique: false,
-    required: false,
-    nullable: true,
-    select: false,
-  })
-  refreshToken?: string;
 }
 
+export type UserDocument = HydratedDocument<User>;
 export const UserSchema = SchemaFactory.createForClass(User);
-export type UserWithId = User & {
-  _id: Types.ObjectId;
-};

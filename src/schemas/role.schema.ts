@@ -1,7 +1,7 @@
-import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
+// Hold
 
-export type RolesDocument = HydratedDocument<Role>;
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument } from 'mongoose';
 
 @Schema({ collection: 'roles' })
 export class Role {
@@ -14,7 +14,9 @@ export class Role {
     required: true,
     nullable: false,
   })
-  userCount: Date;
+  userCount: number;
+
+  // ----- ----- ----- Timestamp ----- ----- ----- //
 
   @Prop({
     type: Date,
@@ -41,7 +43,5 @@ export class Role {
   deletedAt: Date;
 }
 
+export type RolesDocument = HydratedDocument<Role>;
 export const RoleSchema = SchemaFactory.createForClass(Role);
-export type RoleWithId = Role & {
-  _id: Types.ObjectId;
-};

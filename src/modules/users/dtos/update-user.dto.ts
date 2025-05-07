@@ -1,25 +1,37 @@
-import { IsNumber, IsOptional, IsString, Matches, Min } from 'class-validator';
+import {
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Matches,
+  Min,
+} from 'class-validator';
+import { EUserGender } from 'src/enums/users.enum';
 
 export class UpdateUserDto {
   @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  @Matches(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/)
+  @Matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/)
   password?: string;
 
   @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  firstname?: string;
+  firstName?: string;
 
   @IsOptional()
+  @IsNotEmpty()
   @IsString()
-  lastname?: string;
+  lastName?: string;
+
+  @IsOptional()
+  @IsEnum(EUserGender)
+  gender?: EUserGender;
 
   @IsOptional()
   @IsNumber()
   @Min(1)
   age?: number;
-
-  @IsOptional()
-  @IsString()
-  role?: string;
 }

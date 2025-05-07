@@ -1,10 +1,12 @@
+// Hold
+
 import { IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
 export class SearchRolesDto {
   @IsOptional()
-  @IsNotEmpty()
   @IsString()
+  @IsNotEmpty()
   name?: string;
 
   @IsOptional()

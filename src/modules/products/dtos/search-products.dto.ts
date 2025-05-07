@@ -1,38 +1,39 @@
 import { Type } from 'class-transformer';
 import {
-  IsEnum,
   IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
   Min,
 } from 'class-validator';
-import { EUserGender } from 'src/enums/users.enum';
 import { SortDto } from 'src/utils/sort.util';
 
-export class SearchUsersDto extends SortDto {
+export class SearchProductDto extends SortDto {
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  username?: string | Record<string, unknown>;
+  name?: string | Record<string, unknown>;
 
   @IsOptional()
   @IsNotEmpty()
   @IsString()
-  firstName?: string | Record<string, unknown>;
-
-  @IsOptional()
-  @IsNotEmpty()
-  @IsString()
-  lastName?: string | Record<string, unknown>;
-
-  @IsOptional()
-  @IsEnum(EUserGender)
-  gender?: EUserGender;
+  description?: string | Record<string, unknown>;
 
   @IsOptional()
   @IsNumber()
+  @Min(0)
   @Type(() => Number)
+  currentStock?: number;
+
+  @IsOptional()
+  @IsNumber()
   @Min(1)
-  age?: number;
+  @Type(() => Number)
+  price?: number;
+
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  @Type(() => Number)
+  totalSales?: number;
 }
